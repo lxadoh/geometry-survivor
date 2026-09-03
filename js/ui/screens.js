@@ -3,6 +3,8 @@ const Screens = {
     document.getElementById('btn-start').addEventListener('click', callbacks.start);
     document.getElementById('btn-retry').addEventListener('click', callbacks.start);
     document.getElementById('btn-home').addEventListener('click', callbacks.home);
+    document.getElementById('btn-resume').addEventListener('click', callbacks.resume);
+    document.getElementById('btn-lobby').addEventListener('click', callbacks.lobby);
   },
 
   showStart(best) {
@@ -34,4 +36,32 @@ const Screens = {
   },
 
   hideOver() { document.getElementById('screen-over').classList.add('hidden'); },
+
+  showPause(info) {
+    const el = document.getElementById('pause-build');
+    let html = '<div class="pb-title">武器</div><div class="pb-row">';
+    for (const w of info.weapons) {
+      html += this.pauseChip(w.icon, w.name, 'LV' + w.lvl);
+    }
+    if (info.weapons.length === 0) html += '<div class="pb-empty">暂无</div>';
+    html += '</div>';
+    html += '<div class="pb-title">被动</div><div class="pb-row">';
+    for (const p of info.passives) {
+      html += this.pauseChip(p.icon, p.name, '×' + p.stacks);
+    }
+    if (info.passives.length === 0) html += '<div class="pb-empty">暂无</div>';
+    html += '</div>';
+    el.innerHTML = html;
+
+    document.getElementById('vol-slider').value = Math.round(AudioMan.vol * 100);
+    document.getElementById('screen-pause').classList.remove('hidden');
+  },
+
+  pauseChip(icon, name, val) {
+    const accent = UpgradeUI.ACCENTS[icon] || '#6fd3ff';
+    const svg = UpgradeUI.ICONS[icon] || '';
+    return `<div class="pb-chip" style="--accent:${accent}">${svg}<span>${name}</span><b>${val}</b></div>`;
+  },
+
+  hidePause() { document.getElementById('screen-pause').classList.add('hidden'); },
 };

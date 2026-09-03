@@ -6,7 +6,10 @@ UpgradeUI.init();
 Screens.init({
   start: () => { AudioMan.click(); game.startRun(); },
   home: () => { AudioMan.click(); game.toMenu(); },
+  resume: () => { AudioMan.click(); game.closePause(); },
+  lobby: () => { AudioMan.click(); game.toMenu(); },
 });
+document.getElementById('btn-pause').addEventListener('click', () => game.openPause());
 
 const armAudio = () => { AudioMan.init(); AudioMan.resume(); };
 window.addEventListener('pointerdown', armAudio, { once: true });
@@ -15,11 +18,18 @@ window.addEventListener('keydown', armAudio, { once: true });
 const muteBtn = document.getElementById('btn-mute');
 const syncMuteIcon = () => { muteBtn.textContent = AudioMan.muted ? '🔇' : '🔊'; };
 AudioMan.loadMuted();
+AudioMan.loadVol();
 syncMuteIcon();
 muteBtn.addEventListener('click', () => {
   AudioMan.setMuted(!AudioMan.muted);
   syncMuteIcon();
   if (!AudioMan.muted) AudioMan.click();
+});
+
+const volSlider = document.getElementById('vol-slider');
+volSlider.addEventListener('input', () => {
+  AudioMan.setVol(volSlider.value / 100);
+  syncMuteIcon();
 });
 
 window.addEventListener('resize', () => game.resize());

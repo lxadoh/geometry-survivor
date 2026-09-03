@@ -24,6 +24,7 @@ class Game {
     this.pendingLevels = 0;
     this.spawnMul = 1;
     this.lowQuality = false;
+    this.userPaused = false;
     this.viewW = 0;
     this.viewH = 0;
     this.dpr = 1;
@@ -62,6 +63,7 @@ class Game {
     this.kills = 0;
     this.spawnAcc = 0;
     this.pendingLevels = 0;
+    this.userPaused = false;
     this.camera.snap(this.player.x, this.player.y);
     this.state = 'playing';
     Screens.hideStart();
@@ -71,15 +73,43 @@ class Game {
 
   toMenu() {
     this.state = 'menu';
+    this.userPaused = false;
     HUD.hide();
+    Screens.hidePause();
     Screens.hideOver();
     Screens.showStart(SaveManager.load().best);
   }
 
   tick(dt) {
-    if (this.state === 'playing' && !this.paused) this.update(dt);
+    if (this.state === 'playing' && !this.paused && !this.userPaused) this.update(dt);
     this.camera.update(dt);
     this.render();
+  }
+
+  openPause() {
+    if (this.state !== 'playing') return;
+    this.userPaused = true;
+    AudioMan.click();
+    Screens.showPause(this.buildInfo());
+  }
+
+  closePause() {
+    this.userPaused = false;
+    Screens.hidePause();
+  }
+
+  buildInfo() {
+    const weapons = this.weapons.map(w => ({
+      icon: w.id,
+      name: CONFIG.weapons[w.id].name,
+      lvl: w.level,
+    }));
+    const passives = [];
+    for (const id of Object.keys(this.player.passives)) {
+      const n = this.player.passives[id];
+      if (n > 0) passives.push({ icon: id, name: CONFIG.passives[id].name, stacks: n });
+    }
+    return { weapons, passives };
   }
 
   update(dt) {

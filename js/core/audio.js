@@ -2,7 +2,9 @@ const AudioMan = {
   ctx: null,
   master: null,
   muted: false,
+  vol: 0.7,
   KEY: 'geometry-survivor-audio',
+  VOL_KEY: 'geometry-survivor-volume',
   _last: {},
 
   init() {
@@ -11,7 +13,7 @@ const AudioMan = {
       const AC = window.AudioContext || window.webkitAudioContext;
       this.ctx = new AC();
       this.master = this.ctx.createGain();
-      this.master.gain.value = this.muted ? 0 : 0.5;
+      this.master.gain.value = this.muted ? 0 : this.vol;
       this.master.connect(this.ctx.destination);
     } catch (e) {}
   },
@@ -25,10 +27,25 @@ const AudioMan = {
     return this.muted;
   },
 
+  loadVol() {
+    try {
+      const v = parseFloat(localStorage.getItem(this.VOL_KEY));
+      if (!isNaN(v) && v >= 0 && v <= 1) this.vol = v;
+    } catch (e) {}
+    return this.vol;
+  },
+
   setMuted(m) {
     this.muted = m;
     try { localStorage.setItem(this.KEY, m ? '1' : '0'); } catch (e) {}
-    if (this.master) this.master.gain.value = m ? 0 : 0.5;
+    if (this.master) this.master.gain.value = m ? 0 : this.vol;
+  },
+
+  setVol(v) {
+    this.vol = Math.min(1, Math.max(0, v));
+    this.muted = false;
+    try { localStorage.setItem(this.VOL_KEY, String(this.vol)); } catch (e) {}
+    if (this.master) this.master.gain.value = this.vol;
   },
 
   _ok(key, ms) {

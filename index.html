@@ -15,8 +15,11 @@
   <div id="hud-top">
     <div id="hp-wrap"><div id="hp-fill"></div><span id="hp-text">100</span></div>
     <div id="hud-right">
-      <div id="hud-time">00:00</div>
-      <div id="hud-kills">击杀 0</div>
+      <div class="hud-right-text">
+        <div id="hud-time">00:00</div>
+        <div id="hud-kills">击杀 0</div>
+      </div>
+      <button id="btn-pause" aria-label="暂停">⏸</button>
     </div>
   </div>
   <div id="level-badge">LV 1</div>
@@ -37,6 +40,19 @@
   <div class="up-header">— 升级 —</div>
   <div class="up-sub">选择一项强化</div>
   <div id="cards"></div>
+</div>
+
+<div id="screen-pause" class="screen hidden">
+  <div class="up-header pause-title">— 暂停 —</div>
+  <div id="pause-build" class="pause-build"></div>
+  <div class="pause-vol">
+    <span class="pv-label">音量</span>
+    <input type="range" id="vol-slider" min="0" max="100" step="1" value="70" aria-label="音量">
+  </div>
+  <div class="over-btns">
+    <button id="btn-resume" class="btn btn-primary">继续游戏</button>
+    <button id="btn-lobby" class="btn btn-ghost">回到大厅</button>
+  </div>
 </div>
 
 <div id="screen-over" class="screen hidden">
