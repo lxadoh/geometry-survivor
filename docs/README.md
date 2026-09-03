@@ -32,6 +32,9 @@
 - [x] 平台改版决策：微信小游戏 → GitHub Pages；产品文档 v1.1、技术方案 v2.0 更新完成（2026-09-03）
 - [x] **M0 完成（2026-09-03）**：仓库 https://github.com/lxadoh/geometry-survivor 建立并推送；GitHub Pages 开通，占位页验证可访问：**https://lxadoh.github.io/geometry-survivor/**
 - [ ] **M1：核心战斗可玩（浏览器直接玩一局）← 当前阶段**
+  - [x] M1 代码完成（2026-09-03）：移动/镜头/飞刃+环绕球+散射弹/三怪/宝石经验/三选一/死亡结算/本地最高分
+  - [ ] 用户试玩验证（本地双击 index.html 或访问线上地址）
+  - [ ] 根据试玩反馈调数值与手感
 - [ ] M2：完整 MVP（数值调参、电脑/手机浏览器流畅）
 - [ ] M3：最终版正式上线 GitHub Pages
 
