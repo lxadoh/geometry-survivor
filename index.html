@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>几何幸存者 Geometry Survivor</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #0b0e1a;
+    font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    color: #e8ecf4;
+  }
+
+  .stage {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(60, 80, 160, 0.15), transparent 60%),
+      #0b0e1a;
+  }
+
+  /* 玩家：白色圆形 */
+  .player {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 24px rgba(120, 160, 255, 0.8), 0 0 60px rgba(120, 160, 255, 0.35);
+    animation: breathe 2.4s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+
+  h1 {
+    font-size: clamp(28px, 6vw, 44px);
+    letter-spacing: 0.18em;
+    font-weight: 700;
+  }
+
+  .sub {
+    font-size: clamp(13px, 2.5vw, 16px);
+    letter-spacing: 0.5em;
+    text-indent: 0.5em;
+    color: #7ee787;
+    opacity: 0.9;
+  }
+
+  .status {
+    margin-top: 26px;
+    font-size: 14px;
+    color: #8b93a7;
+    border: 1px solid #2a3350;
+    border-radius: 999px;
+    padding: 8px 22px;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 18px;
+    font-size: 12px;
+    color: #4a5170;
+    letter-spacing: 0.1em;
+  }
+
+  /* 敌人：红色三角形 */
+  .enemy {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-bottom: 22px solid #ff5b4d;
+    opacity: 0.75;
+    animation: drift 9s ease-in-out infinite alternate;
+  }
+
+  /* 经验宝石：绿色菱形 */
+  .gem {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #35d07f;
+    transform: rotate(45deg);
+    opacity: 0.8;
+    animation: drift 7s ease-in-out infinite alternate-reverse;
+  }
+
+  @keyframes drift {
+    from { translate: 0 0; }
+    to   { translate: 14px -20px; }
+  }
+
+  .e1 { left: 12%; top: 22%; }
+  .e2 { right: 15%; top: 30%; transform: rotate(140deg); }
+  .e3 { left: 20%; bottom: 26%; transform: rotate(200deg); }
+  .e4 { right: 22%; bottom: 20%; transform: rotate(80deg); }
+  .g1 { left: 28%; top: 55%; }
+  .g2 { right: 30%; top: 60%; }
+  .g3 { left: 45%; top: 16%; }
+  .g4 { right: 42%; bottom: 14%; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="enemy e1"></div>
+    <div class="enemy e2"></div>
+    <div class="enemy e3"></div>
+    <div class="enemy e4"></div>
+    <div class="gem g1"></div>
+    <div class="gem g2"></div>
+    <div class="gem g3"></div>
+    <div class="gem g4"></div>
+
+    <div class="player"></div>
+    <h1>几何幸存者</h1>
+    <div class="sub">GEOMETRY SURVIVOR</div>
+    <div class="status">小游戏建设中 · 敬请期待</div>
+    <div class="footer">Deployed on GitHub Pages · M0 部署验证页</div>
+  </div>
+</body>
+</html>
