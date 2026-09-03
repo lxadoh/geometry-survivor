@@ -43,12 +43,16 @@ volSliderMenu.addEventListener('input', () => {
 window.addEventListener('resize', () => game.resize());
 game.toMenu();
 
-const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
-let wechatPortraitOk = false;
+const ua = navigator.userAgent;
+const inWeChat = /MicroMessenger/i.test(ua);
+const inQQ = /MQQBrowser|QQ\//i.test(ua);
+const appName = inWeChat ? '微信' : 'QQ';
+const inApp = inWeChat || inQQ;
+let appPortraitOk = false;
 
 const rotateMql = window.matchMedia('(orientation: portrait) and (pointer: coarse)');
 const syncRotate = () => {
-  game.paused = rotateMql.matches && !(isWeChat && wechatPortraitOk);
+  game.paused = rotateMql.matches && !(inApp && appPortraitOk);
 };
 if (rotateMql.addEventListener) rotateMql.addEventListener('change', syncRotate);
 syncRotate();
@@ -72,16 +76,16 @@ if (fsBtn && fsEnabled && matchMedia('(pointer: coarse)').matches) {
   });
 }
 
-if (isWeChat) {
+if (inApp) {
   const rp = document.getElementById('rotate-prompt');
   const sub = rp.querySelector('.rp-sub');
-  if (sub) sub.innerHTML = '微信内无法横屏<br>点右上角 ··· 选「在浏览器打开」体验最佳';
+  if (sub) sub.innerHTML = appName + '内无法横屏<br>点右上角 ··· 选「在浏览器打开」体验最佳';
   const btn = document.createElement('button');
   btn.className = 'btn btn-ghost';
   btn.textContent = '竖屏继续游玩';
   btn.style.marginTop = '8px';
   btn.addEventListener('click', () => {
-    wechatPortraitOk = true;
+    appPortraitOk = true;
     rp.style.display = 'none';
     syncRotate();
   });
