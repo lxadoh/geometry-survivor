@@ -18,7 +18,7 @@ class Particle {
 
 class ParticleSystem {
   constructor(max) {
-    this.max = max;
+    this.cap = max;
     this.pool = new Pool(() => new Particle());
     this.list = [];
   }
@@ -26,7 +26,7 @@ class ParticleSystem {
   burst(x, y, count, color, opt) {
     opt = opt || {};
     for (let i = 0; i < count; i++) {
-      if (this.list.length >= this.max) return;
+      if (this.list.length >= this.cap) return;
       const p = this.pool.obtain();
       const a = Math.random() * TAU;
       const sp = rand(40, opt.speed || 160);

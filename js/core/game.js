@@ -11,6 +11,8 @@ class Game {
     this.enemies = [];
     this.bullets = [];
     this.gems = [];
+    this.lightnings = [];
+    this.shocks = [];
     this._grid = new Map();
     this.player = new Player();
     this.weapons = [];
@@ -19,6 +21,8 @@ class Game {
     this.kills = 0;
     this.spawnAcc = 0;
     this.pendingLevels = 0;
+    this.spawnMul = 1;
+    this.lowQuality = false;
     this.viewW = 0;
     this.viewH = 0;
     this.dpr = 1;
@@ -47,6 +51,8 @@ class Game {
     this.enemies.length = 0;
     this.bullets.length = 0;
     this.gems.length = 0;
+    this.lightnings.length = 0;
+    this.shocks.length = 0;
     this.particles.clear();
     this.player.reset();
     this.weapons = [new WEAPON_CLASSES.blade('blade')];
@@ -65,7 +71,7 @@ class Game {
     this.state = 'menu';
     HUD.hide();
     Screens.hideOver();
-    Screens.showStart(SaveManager.load());
+    Screens.showStart(SaveManager.load().best);
   }
 
   tick(dt) {
@@ -137,9 +143,66 @@ class Game {
     }
 
     this.particles.update(dt);
+    this.updateFX(dt);
     this.camera.follow(p.x, p.y, dt);
 
     if (this.pendingLevels > 0) this.openUpgrade();
+  }
+
+  lightningStrike(enemy, damage) {
+    const cam = this.camera;
+    const topY = cam.y - cam.vh / 2 - 80;
+    const n = 6;
+    const pts = [];
+    for (let i = 0; i <= n; i++) {
+      const t = i / n;
+      pts.push({
+        x: enemy.x + (1 - t) * rand(-46, 46) + (t < 0.9 ? rand(-8, 8) : 0),
+        y: topY + (enemy.y - topY) * t,
+      });
+    }
+    this.lightnings.push({ pts, life: 0.22, maxLife: 0.22 });
+    this.particles.burst(enemy.x, enemy.y, 8, '#ffe066', { speed: 200, life: 0.35, size: 2.6 });
+    this.hurtEnemy(enemy, damage, 0, 0);
+    this.camera.shake(2, 0.1);
+  }
+
+  castShockwave(maxR, damage) {
+    const p = this.player;
+    this.shocks.push({
+      x: p.x, y: p.y, r: 18, maxR, speed: 560,
+      damage, hitSet: new Set(),
+    });
+  }
+
+  updateFX(dt) {
+    for (let i = this.lightnings.length - 1; i >= 0; i--) {
+      const l = this.lightnings[i];
+      l.life -= dt;
+      if (l.life <= 0) this.lightnings.splice(i, 1);
+    }
+    for (let i = this.shocks.length - 1; i >= 0; i--) {
+      const s = this.shocks[i];
+      s.r += s.speed * dt;
+      for (const e of this.enemies) {
+        if (e.dead || s.hitSet.has(e)) continue;
+        const d = Math.hypot(e.x - s.x, e.y - s.y);
+        if (Math.abs(d - s.r) < 26 + e.radius) {
+          s.hitSet.add(e);
+          const kx = d > 1 ? (e.x - s.x) / d : 0;
+          const ky = d > 1 ? (e.y - s.y) / d : -1;
+          this.hurtEnemy(e, s.damage, kx * 170, ky * 170);
+        }
+      }
+      if (s.r >= s.maxR) this.shocks.splice(i, 1);
+    }
+  }
+
+  setLowQuality() {
+    if (this.lowQuality) return;
+    this.lowQuality = true;
+    this.particles.cap = 120;
+    this.spawnMul = 0.7;
   }
 
   updateSpawn(dt) {
@@ -155,7 +218,7 @@ class Game {
     }
     while (this.spawnAcc >= 1) {
       this.spawnAcc -= 1;
-      if (this.enemies.length >= cap) break;
+      if (this.enemies.length >= Math.round(cap * this.spawnMul)) break;
       this.spawnEnemy(min);
     }
   }
@@ -352,8 +415,8 @@ class Game {
     this.state = 'gameover';
     HUD.hide();
     const rec = { time: this.time, kills: this.kills, level: this.player.level };
-    const isBest = SaveManager.submit(rec);
-    Screens.showGameOver(rec, SaveManager.load(), isBest);
+    const res = SaveManager.submit(rec);
+    Screens.showGameOver(rec, res.data, res.isBest);
   }
 
   render() {
@@ -379,11 +442,48 @@ class Game {
     for (const w of this.weapons) w.draw(ctx, this);
     this.player.draw(ctx);
     for (const b of this.bullets) b.draw(ctx);
+    this.drawShocks(ctx);
     this.particles.draw(ctx);
+    this.drawLightnings(ctx);
 
     ctx.restore();
 
     if (this.input.touch && this.state === 'playing') this.drawJoystick(ctx);
+  }
+
+  drawLightnings(ctx) {
+    for (const l of this.lightnings) {
+      const a = Math.max(0, l.life / l.maxLife);
+      ctx.strokeStyle = 'rgba(255,224,102,' + (0.25 * a).toFixed(3) + ')';
+      ctx.lineWidth = 8;
+      this.strokePts(ctx, l.pts);
+      ctx.strokeStyle = 'rgba(255,255,255,' + (0.9 * a).toFixed(3) + ')';
+      ctx.lineWidth = 3;
+      this.strokePts(ctx, l.pts);
+    }
+  }
+
+  strokePts(ctx, pts) {
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.stroke();
+  }
+
+  drawShocks(ctx) {
+    for (const s of this.shocks) {
+      const a = Math.max(0, 1 - s.r / s.maxR);
+      ctx.strokeStyle = 'rgba(109,211,255,' + (0.75 * a + 0.1).toFixed(3) + ')';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, TAU);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(109,211,255,' + (0.25 * a).toFixed(3) + ')';
+      ctx.lineWidth = 14;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, Math.max(1, s.r - 10), 0, TAU);
+      ctx.stroke();
+    }
   }
 
   drawGrid(ctx) {

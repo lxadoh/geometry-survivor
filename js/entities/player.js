@@ -1,6 +1,6 @@
 class Player {
   constructor() {
-    this.passives = { attack: 0, haste: 0, speed: 0, hp: 0 };
+    this.passives = { attack: 0, haste: 0, speed: 0, hp: 0, pickup: 0 };
     this.reset();
   }
 
@@ -19,6 +19,7 @@ class Player {
     this.passives.haste = 0;
     this.passives.speed = 0;
     this.passives.hp = 0;
+    this.passives.pickup = 0;
     this.invuln = 0;
     this.faceX = 1;
     this.faceY = 0;
@@ -29,7 +30,7 @@ class Player {
     this.damageMul = 1 + CONFIG.passives.attack.per * this.passives.attack;
     this.intervalMul = Math.pow(1 - CONFIG.passives.haste.per, this.passives.haste);
     this.moveSpeed = CONFIG.player.speed * (1 + CONFIG.passives.speed.per * this.passives.speed);
-    this.pickupR = CONFIG.player.pickupRadius;
+    this.pickupR = CONFIG.player.pickupRadius * (1 + CONFIG.passives.pickup.per * this.passives.pickup);
   }
 
   update(dt, input) {
@@ -66,6 +67,14 @@ class Player {
   heal(v) { this.hp = Math.min(this.maxHp, this.hp + v); }
 
   draw(ctx) {
+    if (this.passives.pickup > 0) {
+      ctx.strokeStyle = 'rgba(53,208,127,0.1)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.pickupR, 0, TAU);
+      ctx.stroke();
+    }
+
     ctx.globalAlpha = this.invuln > 0
       ? 0.5 + 0.4 * Math.sin(performance.now() * 0.03)
       : 1;

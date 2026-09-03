@@ -117,8 +117,39 @@ class ScatterWeapon extends Weapon {
   }
 }
 
+class LightningWeapon extends Weapon {
+  fire(game) {
+    const cam = game.camera;
+    const cands = [];
+    for (const e of game.enemies) {
+      if (e.dead) continue;
+      if (Math.abs(e.x - cam.x) < cam.vw / 2 + 40 && Math.abs(e.y - cam.y) < cam.vh / 2 + 40) {
+        cands.push(e);
+      }
+    }
+    if (cands.length === 0) return false;
+    const s = this.stats;
+    shuffle(cands);
+    const n = Math.min(s.count, cands.length);
+    for (let i = 0; i < n; i++) {
+      game.lightningStrike(cands[i], Math.round(s.damage * game.player.damageMul));
+    }
+    return true;
+  }
+}
+
+class ShockwaveWeapon extends Weapon {
+  fire(game) {
+    const s = this.stats;
+    game.castShockwave(s.radius, Math.round(s.damage * game.player.damageMul));
+    return true;
+  }
+}
+
 const WEAPON_CLASSES = {
   blade: BladeWeapon,
   orbit: OrbitWeapon,
   scatter: ScatterWeapon,
+  lightning: LightningWeapon,
+  shock: ShockwaveWeapon,
 };

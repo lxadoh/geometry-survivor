@@ -1,25 +1,35 @@
 const SaveManager = {
-  KEY: 'geometry-survivor-best',
+  KEY: 'geometry-survivor-save',
 
   load() {
     try {
       const raw = localStorage.getItem(this.KEY);
-      const rec = raw ? JSON.parse(raw) : null;
-      return rec && typeof rec.time === 'number' ? rec : null;
-    } catch (e) { return null; }
+      const d = raw ? JSON.parse(raw) : null;
+      return {
+        best: d && d.best ? d.best : null,
+        runs: Array.isArray(d && d.runs) ? d.runs : [],
+      };
+    } catch (e) {
+      return { best: null, runs: [] };
+    }
   },
 
   submit(rec) {
-    const best = this.load();
-    if (!best || rec.time > best.time) {
-      try { localStorage.setItem(this.KEY, JSON.stringify(rec)); } catch (e) {}
-      return true;
-    }
-    return false;
+    const data = this.load();
+    const isBest = !data.best || rec.time > data.best.time;
+    if (isBest) data.best = rec;
+    data.runs.unshift(rec);
+    if (data.runs.length > 10) data.runs.length = 10;
+    try { localStorage.setItem(this.KEY, JSON.stringify(data)); } catch (e) {}
+    return { isBest, data };
   },
 
   format(rec) {
     if (!rec) return '';
     return `历史最高 ${fmtTime(rec.time)} · 击杀 ${rec.kills} · LV ${rec.level}`;
+  },
+
+  formatRun(rec) {
+    return `${fmtTime(rec.time)} · ${rec.kills} 杀 · LV ${rec.level}`;
   }
 };

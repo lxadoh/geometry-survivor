@@ -57,6 +57,8 @@ if (isWeChat) {
 }
 
 let last = performance.now();
+let fpsEma = 60;
+let lowT = 0;
 function frame(t) {
   requestAnimationFrame(frame);
   let dt = (t - last) / 1000;
@@ -65,5 +67,15 @@ function frame(t) {
   if (dt < 0) dt = 0;
   game.tick(dt);
   if (game.state === 'playing') HUD.update(game);
+
+  if (dt > 0.001) {
+    fpsEma += (1 / dt - fpsEma) * 0.04;
+    if (fpsEma < 42 && game.state === 'playing' && !game.paused) {
+      lowT += dt;
+      if (lowT > 4) game.setLowQuality();
+    } else {
+      lowT = 0;
+    }
+  }
 }
 requestAnimationFrame(frame);

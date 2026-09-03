@@ -62,6 +62,30 @@ const CONFIG = {
         { count: 5, damage: 16, spread: 0.7,  radius: 9 },
       ],
     },
+    lightning: {
+      name: '闪电',
+      desc: '每隔数秒从天而降，劈中屏幕内随机敌人',
+      interval: 3.2,
+      levels: [
+        { count: 1, damage: 26 },
+        { count: 1, damage: 36 },
+        { count: 2, damage: 36 },
+        { count: 2, damage: 48 },
+        { count: 3, damage: 62 },
+      ],
+    },
+    shock: {
+      name: '冲击波',
+      desc: '周期性以你为中心释放一圈范围冲击，击退敌人',
+      interval: 3.6,
+      levels: [
+        { radius: 150, damage: 22 },
+        { radius: 170, damage: 30 },
+        { radius: 200, damage: 38 },
+        { radius: 235, damage: 48 },
+        { radius: 275, damage: 62 },
+      ],
+    },
   },
 
   passives: {
@@ -69,6 +93,7 @@ const CONFIG = {
     haste:  { name: '攻速+',   per: 0.15, max: 5, desc: '全武器触发间隔 -15%' },
     speed:  { name: '移速+',   per: 0.1,  max: 5, desc: '移动速度 +10%' },
     hp:     { name: '最大生命+', per: 20, max: 5, desc: '最大生命 +20 并回复该数值' },
+    pickup: { name: '拾取范围+', per: 0.3, max: 5, desc: '经验宝石吸取范围 +30%' },
   },
 
   bullets: {
