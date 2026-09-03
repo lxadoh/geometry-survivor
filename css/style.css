@@ -399,8 +399,9 @@ html, body {
 .pb-empty { font-size: 13px; color: #4a5170; }
 
 .pause-vol { display: flex; align-items: center; gap: 14px; margin-top: 4px; }
+.menu-vol { margin-top: -4px; }
 .pv-label { font-size: 13px; color: #8b93a7; letter-spacing: 0.12em; }
-#vol-slider {
+#vol-slider, #vol-slider-menu {
   width: min(240px, 56vw);
   accent-color: #7ee787;
   cursor: pointer;

@@ -2,7 +2,8 @@ const AudioMan = {
   ctx: null,
   master: null,
   muted: false,
-  vol: 0.7,
+  vol: 0.85,
+  BOOST: 1.4,
   KEY: 'geometry-survivor-audio',
   VOL_KEY: 'geometry-survivor-volume',
   _last: {},
@@ -65,7 +66,7 @@ const AudioMan = {
     o.frequency.setValueAtTime(freq, t);
     if (opt.to) o.frequency.exponentialRampToValueAtTime(Math.max(30, opt.to), t + dur);
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(opt.vol || 0.25, t + 0.008);
+    g.gain.linearRampToValueAtTime((opt.vol || 0.25) * this.BOOST, t + 0.008);
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
     o.connect(g);
     g.connect(this.master);
@@ -89,7 +90,7 @@ const AudioMan = {
     if (opt.to) f.frequency.exponentialRampToValueAtTime(Math.max(40, opt.to), t + dur);
     f.Q.value = opt.q || 1;
     const g = this.ctx.createGain();
-    g.gain.setValueAtTime(opt.vol || 0.25, t);
+    g.gain.setValueAtTime((opt.vol || 0.25) * this.BOOST, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
     src.connect(f);
     f.connect(g);

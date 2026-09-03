@@ -20,6 +20,7 @@ const syncMuteIcon = () => { muteBtn.textContent = AudioMan.muted ? 'ðŸ”‡' : 'ðŸ
 AudioMan.loadMuted();
 AudioMan.loadVol();
 syncMuteIcon();
+document.getElementById('vol-slider-menu').value = Math.round(AudioMan.vol * 100);
 muteBtn.addEventListener('click', () => {
   AudioMan.setMuted(!AudioMan.muted);
   syncMuteIcon();
@@ -27,8 +28,15 @@ muteBtn.addEventListener('click', () => {
 });
 
 const volSlider = document.getElementById('vol-slider');
+const volSliderMenu = document.getElementById('vol-slider-menu');
 volSlider.addEventListener('input', () => {
   AudioMan.setVol(volSlider.value / 100);
+  volSliderMenu.value = volSlider.value;
+  syncMuteIcon();
+});
+volSliderMenu.addEventListener('input', () => {
+  AudioMan.setVol(volSliderMenu.value / 100);
+  volSlider.value = volSliderMenu.value;
   syncMuteIcon();
 });
 
