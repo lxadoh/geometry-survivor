@@ -41,6 +41,31 @@ html, body {
   100% { opacity: 0; }
 }
 
+/* ---------- 横屏提示（仅手机竖屏时出现） ---------- */
+#rotate-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: #0b0e1a;
+  text-align: center;
+  padding: 24px;
+}
+#rotate-prompt .rp-title { font-size: 22px; font-weight: 700; letter-spacing: 0.2em; }
+#rotate-prompt .rp-sub { font-size: 13px; color: #6f7890; }
+#rotate-prompt .rp-icon { animation: rotateHint 2.2s ease-in-out infinite; }
+@keyframes rotateHint {
+  0%, 25% { transform: rotate(0deg); }
+  65%, 100% { transform: rotate(90deg); }
+}
+@media (orientation: portrait) and (pointer: coarse) {
+  #rotate-prompt { display: flex; }
+}
+
 /* ---------- HUD ---------- */
 #hud { position: fixed; inset: 0; pointer-events: none; }
 #hud.hidden { display: none; }

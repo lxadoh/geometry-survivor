@@ -11,6 +11,11 @@ Screens.init({
 window.addEventListener('resize', () => game.resize());
 game.toMenu();
 
+const rotateMql = window.matchMedia('(orientation: portrait) and (pointer: coarse)');
+const syncRotate = () => { game.paused = rotateMql.matches; };
+if (rotateMql.addEventListener) rotateMql.addEventListener('change', syncRotate);
+syncRotate();
+
 let last = performance.now();
 function frame(t) {
   requestAnimationFrame(frame);

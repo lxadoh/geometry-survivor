@@ -4,24 +4,24 @@ const CONFIG = {
     speed: 180,
     radius: 15,
     pickupRadius: 90,
-    iframes: 0.6,
+    iframes: 0.75,
   },
   world: { width: 2800, height: 2100, grid: 120 },
-  spawn: { baseRate: 1.2, ratePerMin: 0.8, cap: 150 },
-  growth: { hp: 0.45, dmg: 0.25 },
-  xp: { base: 5, perLevel: 8 },
+  spawn: { baseRate: 1.0, ratePerMin: 0.55, cap: 150 },
+  growth: { hp: 0.32, dmg: 0.17 },
+  xp: { base: 5, perLevel: 7 },
 
   enemies: {
     grunt: { radius: 13, speed: 72,  hp: 10, damage: 8,  xp: 1, color: '#ff5b4d', knockMul: 1 },
-    fast:  { radius: 10, speed: 150, hp: 7,  damage: 5,  xp: 1, color: '#ff9a3d', knockMul: 1.4 },
+    fast:  { radius: 10, speed: 140, hp: 7,  damage: 5,  xp: 1, color: '#ff9a3d', knockMul: 1.4 },
     tank:  { radius: 26, speed: 38,  hp: 70, damage: 16, xp: 3, color: '#d64545', knockMul: 0.25 },
   },
 
   spawnMix: [
     { until: 1,  grunt: 1,   fast: 0,    tank: 0 },
     { until: 2,  grunt: 0.75, fast: 0.25, tank: 0 },
-    { until: 4,  grunt: 0.6,  fast: 0.25, tank: 0.15 },
-    { until: 99, grunt: 0.45, fast: 0.35, tank: 0.2 },
+    { until: 4,  grunt: 0.62, fast: 0.26, tank: 0.12 },
+    { until: 99, grunt: 0.52, fast: 0.33, tank: 0.15 },
   ],
 
   weapons: {
@@ -64,6 +64,7 @@ const CONFIG = {
     attack: { name: '攻击力+', per: 0.2,  max: 5, desc: '全武器伤害 +20%' },
     haste:  { name: '攻速+',   per: 0.15, max: 5, desc: '全武器触发间隔 -15%' },
     speed:  { name: '移速+',   per: 0.1,  max: 5, desc: '移动速度 +10%' },
+    hp:     { name: '最大生命+', per: 20, max: 5, desc: '最大生命 +20 并回复该数值' },
   },
 
   bullets: {

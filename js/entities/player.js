@@ -1,6 +1,6 @@
 class Player {
   constructor() {
-    this.passives = { attack: 0, haste: 0, speed: 0 };
+    this.passives = { attack: 0, haste: 0, speed: 0, hp: 0 };
     this.reset();
   }
 
@@ -18,6 +18,7 @@ class Player {
     this.passives.attack = 0;
     this.passives.haste = 0;
     this.passives.speed = 0;
+    this.passives.hp = 0;
     this.invuln = 0;
     this.faceX = 1;
     this.faceY = 0;

@@ -22,6 +22,7 @@ class Game {
     this.viewW = 0;
     this.viewH = 0;
     this.dpr = 1;
+    this.paused = false;
     this.resize();
     this.camera.snap(this.player.x, this.player.y);
   }
@@ -59,11 +60,12 @@ class Game {
   toMenu() {
     this.state = 'menu';
     HUD.hide();
+    Screens.hideOver();
     Screens.showStart(SaveManager.load());
   }
 
   tick(dt) {
-    if (this.state === 'playing') this.update(dt);
+    if (this.state === 'playing' && !this.paused) this.update(dt);
     this.camera.update(dt);
     this.render();
   }
@@ -301,7 +303,12 @@ class Game {
       else this.weapons.push(new WEAPON_CLASSES[c.id](c.id));
     } else if (c.kind === 'passive') {
       this.player.passives[c.id]++;
-      this.player.recompute();
+      if (c.id === 'hp') {
+        this.player.maxHp += CONFIG.passives.hp.per;
+        this.player.heal(CONFIG.passives.hp.per);
+      } else {
+        this.player.recompute();
+      }
     } else if (c.kind === 'heal') {
       this.player.heal(30);
     }
@@ -320,6 +327,8 @@ class Game {
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.fillStyle = '#0d1022';
     ctx.fillRect(0, 0, this.viewW, this.viewH);
+
+    if (this.state === 'menu') return;
 
     ctx.save();
     this.camera.apply(ctx);

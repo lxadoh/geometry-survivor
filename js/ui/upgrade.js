@@ -5,7 +5,7 @@ const UpgradeUI = {
 
   ACCENTS: {
     blade: '#6fd3ff', orbit: '#b7a8ff', scatter: '#ffb35c',
-    attack: '#ff7a7a', haste: '#ffe066', speed: '#7ee787', heal: '#7ee787',
+    attack: '#ff7a7a', haste: '#ffe066', speed: '#7ee787', hp: '#5affa8', heal: '#7ee787',
   },
 
   ICONS: {
@@ -15,6 +15,7 @@ const UpgradeUI = {
     attack: '<svg viewBox="0 0 32 24"><path d="M16 2 L24 13 H20 V22 H12 V13 H8 Z" fill="currentColor"/></svg>',
     haste: '<svg viewBox="0 0 32 24"><path d="M19 2 L9 14 H14 L12 22 L23 10 H17 Z" fill="currentColor"/></svg>',
     speed: '<svg viewBox="0 0 32 24"><path d="M4 4 L12 12 L4 20 Z" fill="currentColor"/><path d="M14 4 L22 12 L14 20 Z" fill="currentColor" opacity=".7"/></svg>',
+    hp: '<svg viewBox="0 0 32 24"><path d="M13 3 H19 V9 H25 V15 H19 V21 H13 V15 H7 V9 H13 Z" fill="currentColor"/></svg>',
     heal: '<svg viewBox="0 0 32 24"><path d="M13 3 H19 V9 H25 V15 H19 V21 H13 V15 H7 V9 H13 Z" fill="currentColor"/></svg>',
   },
 
