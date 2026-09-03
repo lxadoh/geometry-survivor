@@ -82,7 +82,7 @@ class Game {
     for (const w of this.weapons) w.update(dt, this);
 
     for (const b of this.bullets) {
-      if (b.update(dt, this.player)) continue;
+      if (b.update(dt)) continue;
       for (const e of this.enemies) {
         if (e.dead || b.hitSet.has(e)) continue;
         const rr = e.radius + b.radius;
@@ -90,6 +90,13 @@ class Game {
           b.hitSet.add(e);
           const d = Math.hypot(b.vx, b.vy) || 1;
           this.hurtEnemy(e, b.damage, b.vx / d * 95, b.vy / d * 95);
+          if (b.bounces > 0) {
+            const next = this.bounceTarget(b, e);
+            if (next) {
+              b.bounces--;
+              b.target = next;
+            }
+          }
           if (b.pierce-- <= 0) { b.life = 0; break; }
         }
       }
@@ -236,6 +243,17 @@ class Game {
     this.bullets.push(b);
   }
 
+  bounceTarget(b, from) {
+    const R = 280;
+    let best = null, bestD = R * R;
+    for (const e of this.enemies) {
+      if (e.dead || e === from || b.hitSet.has(e)) continue;
+      const d = dist2(from.x, from.y, e.x, e.y);
+      if (d < bestD) { bestD = d; best = e; }
+    }
+    return best;
+  }
+
   spawnGem(x, y, value) {
     const g = this.gemPool.obtain();
     g.init(x, y, value);
@@ -305,7 +323,8 @@ class Game {
       if ((a.count || 0) !== (b.count || 0)) parts.push('数量 ' + a.count + '→' + b.count);
       if ((a.radius || 0) !== (b.radius || 0)) parts.push('体积 ' + a.radius + '→' + b.radius);
       if ((a.ring || 0) !== (b.ring || 0)) parts.push('环绕半径 ' + a.ring + '→' + b.ring);
-      if (!a.boomerang && b.boomerang) parts.push('解锁回旋：飞出后返回再打一轮');
+      if (!a.bounces && b.bounces) parts.push('解锁弹射：命中后跳向下一个敌人');
+      else if ((a.bounces || 0) < (b.bounces || 0)) parts.push('弹射 ' + a.bounces + '→' + b.bounces + ' 次');
       desc = parts.join(' · ') || '属性提升';
     }
     return { kind: 'weapon', id, icon: id, name: w.name, tag, desc };

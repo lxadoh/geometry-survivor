@@ -29,14 +29,14 @@ const CONFIG = {
   weapons: {
     blade: {
       name: '飞刃',
-      desc: '自动射向最近敌人的贯穿飞刃，3 级起可回旋往返',
+      desc: '自动射向最近敌人；2 级起命中后弹射链打下一个敌人',
       interval: 1.1,
       levels: [
-        { count: 1, damage: 10, speed: 420, radius: 9 },
-        { count: 1, damage: 15, speed: 440, radius: 11 },
-        { count: 1, damage: 15, speed: 460, radius: 11, boomerang: true, out: 260 },
-        { count: 1, damage: 24, speed: 480, radius: 13, boomerang: true, out: 300 },
-        { count: 2, damage: 30, speed: 520, radius: 15, boomerang: true, out: 340 },
+        { count: 1, damage: 10, speed: 420, radius: 9,  bounces: 0 },
+        { count: 1, damage: 13, speed: 430, radius: 10, bounces: 1 },
+        { count: 1, damage: 16, speed: 440, radius: 10, bounces: 2 },
+        { count: 1, damage: 20, speed: 460, radius: 11, bounces: 3 },
+        { count: 1, damage: 26, speed: 480, radius: 14, bounces: 4 },
       ],
     },
     orbit: {

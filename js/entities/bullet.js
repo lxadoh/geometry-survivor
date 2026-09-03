@@ -4,10 +4,8 @@ class Bullet {
     this.kind = 'blade'; this.radius = 9; this.life = 1;
     this.pierce = 99; this.damage = 0; this.angle = 0;
     this.speed = 400;
-    this.boomerang = false;
-    this.out = 0;
-    this.phase = 0;
-    this.traveled = 0;
+    this.bounces = 0;
+    this.target = null;
     this.hitSet = new Set();
   }
 
@@ -21,28 +19,22 @@ class Bullet {
     this.life = params.life;
     this.pierce = params.pierce;
     this.damage = params.damage;
-    this.boomerang = !!params.boomerang;
-    this.out = params.out || 0;
-    this.phase = 0;
-    this.traveled = 0;
+    this.bounces = params.bounces || 0;
+    this.target = null;
     this.hitSet.clear();
   }
 
-  update(dt, player) {
-    if (this.boomerang && this.phase === 0) {
-      this.traveled += this.speed * dt;
-      if (this.traveled >= this.out) {
-        this.phase = 1;
-        this.hitSet.clear();
+  update(dt) {
+    if (this.target) {
+      if (this.target.dead || this.hitSet.has(this.target)) {
+        this.target = null;
+      } else {
+        const dx = this.target.x - this.x, dy = this.target.y - this.y;
+        const d = Math.hypot(dx, dy) || 1;
+        this.angle = Math.atan2(dy, dx);
+        this.vx = dx / d * this.speed;
+        this.vy = dy / d * this.speed;
       }
-    }
-    if (this.phase === 1 && player) {
-      const dx = player.x - this.x, dy = player.y - this.y;
-      const d = Math.hypot(dx, dy) || 1;
-      this.angle = Math.atan2(dy, dx);
-      this.vx = dx / d * this.speed;
-      this.vy = dy / d * this.speed;
-      if (d < 26) this.life = 0;
     }
     this.x += this.vx * dt;
     this.y += this.vy * dt;

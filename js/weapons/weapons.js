@@ -37,8 +37,7 @@ class BladeWeapon extends Weapon {
         radius: s.radius,
         life: 4,
         pierce: 99,
-        boomerang: !!s.boomerang,
-        out: s.out || 260,
+        bounces: s.bounces || 0,
       });
     }
     return true;
