@@ -12,7 +12,7 @@ class Weapon {
     this.cd -= dt;
     if (this.cd <= 0) {
       this.cd = this.fire(game)
-        ? this.stats.interval * game.player.intervalMul
+        ? this.conf.interval * game.player.intervalMul
         : 0.2;
     }
   }
@@ -29,8 +29,17 @@ class BladeWeapon extends Weapon {
     const s = this.stats;
     const base = Math.atan2(target.y - p.y, target.x - p.x);
     for (let i = 0; i < s.count; i++) {
-      const a = base + (i - (s.count - 1) / 2) * 0.14;
-      game.spawnBullet(p.x, p.y, a, 'blade', Math.round(s.damage * p.damageMul));
+      const a = base + (i - (s.count - 1) / 2) * 0.45;
+      game.spawnBullet(p.x, p.y, a, {
+        kind: 'blade',
+        damage: Math.round(s.damage * p.damageMul),
+        speed: s.speed,
+        radius: s.radius,
+        life: 4,
+        pierce: 99,
+        boomerang: !!s.boomerang,
+        out: s.out || 260,
+      });
     }
     return true;
   }
@@ -45,7 +54,7 @@ class OrbitWeapon extends Weapon {
   update(dt, game) {
     this.angle += dt * CONFIG.orbit.spin;
     const s = this.stats, p = game.player;
-    const R = CONFIG.orbit.radius, r = CONFIG.orbit.ballRadius;
+    const R = s.ring, r = CONFIG.orbit.ballRadius;
     for (let i = 0; i < s.count; i++) {
       const a = this.angle + i * TAU / s.count;
       const bx = p.x + Math.cos(a) * R;
@@ -57,7 +66,7 @@ class OrbitWeapon extends Weapon {
           const d = Math.hypot(e.x - p.x, e.y - p.y) || 1;
           game.hurtEnemy(e, Math.round(s.damage * p.damageMul),
             (e.x - p.x) / d * 130, (e.y - p.y) / d * 130);
-          e.orbitCd = s.interval * p.intervalMul;
+          e.orbitCd = CONFIG.orbit.hitCd * p.intervalMul;
         }
       }
     }
@@ -66,7 +75,7 @@ class OrbitWeapon extends Weapon {
   draw(ctx, game) {
     const p = game.player;
     const s = this.stats;
-    const R = CONFIG.orbit.radius, r = CONFIG.orbit.ballRadius;
+    const R = s.ring, r = CONFIG.orbit.ballRadius;
     ctx.strokeStyle = 'rgba(157,140,255,0.15)';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -92,10 +101,18 @@ class ScatterWeapon extends Weapon {
   fire(game) {
     const p = game.player;
     const s = this.stats;
+    const bc = CONFIG.bullets.scatter;
     const base = Math.random() * TAU;
     for (let i = 0; i < s.count; i++) {
       const a = base + (i - (s.count - 1) / 2) * s.spread;
-      game.spawnBullet(p.x, p.y, a, 'scatter', Math.round(s.damage * p.damageMul));
+      game.spawnBullet(p.x, p.y, a, {
+        kind: 'scatter',
+        damage: Math.round(s.damage * p.damageMul),
+        speed: bc.speed,
+        radius: s.radius,
+        life: bc.life,
+        pierce: 0,
+      });
     }
     return true;
   }

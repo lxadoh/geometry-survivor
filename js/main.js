@@ -11,10 +11,50 @@ Screens.init({
 window.addEventListener('resize', () => game.resize());
 game.toMenu();
 
+const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
+let wechatPortraitOk = false;
+
 const rotateMql = window.matchMedia('(orientation: portrait) and (pointer: coarse)');
-const syncRotate = () => { game.paused = rotateMql.matches; };
+const syncRotate = () => {
+  game.paused = rotateMql.matches && !(isWeChat && wechatPortraitOk);
+};
 if (rotateMql.addEventListener) rotateMql.addEventListener('change', syncRotate);
 syncRotate();
+
+const fsBtn = document.getElementById('btn-fullscreen');
+const fsEnabled = document.documentElement.requestFullscreen
+  || document.documentElement.webkitRequestFullscreen;
+if (fsBtn && fsEnabled && matchMedia('(pointer: coarse)').matches) {
+  fsBtn.style.display = 'flex';
+  fsBtn.addEventListener('click', () => {
+    const el = document.documentElement;
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) exit.call(document);
+    } else {
+      try {
+        const p = fsEnabled.call(el);
+        if (p && p.catch) p.catch(() => {});
+      } catch (e) {}
+    }
+  });
+}
+
+if (isWeChat) {
+  const rp = document.getElementById('rotate-prompt');
+  const sub = rp.querySelector('.rp-sub');
+  if (sub) sub.innerHTML = '微信内无法横屏<br>点右上角 ··· 选「在浏览器打开」体验最佳';
+  const btn = document.createElement('button');
+  btn.className = 'btn btn-ghost';
+  btn.textContent = '竖屏继续游玩';
+  btn.style.marginTop = '8px';
+  btn.addEventListener('click', () => {
+    wechatPortraitOk = true;
+    rp.style.display = 'none';
+    syncRotate();
+  });
+  rp.appendChild(btn);
+}
 
 let last = performance.now();
 function frame(t) {

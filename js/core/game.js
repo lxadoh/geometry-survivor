@@ -33,7 +33,11 @@ class Game {
     this.viewH = window.innerHeight;
     this.canvas.width = Math.round(this.viewW * this.dpr);
     this.canvas.height = Math.round(this.viewH * this.dpr);
-    this.camera.resize(this.viewW, this.viewH);
+    this.zoom = this.viewH / CONFIG.view.height;
+    if (this.viewW / this.zoom > CONFIG.world.width) {
+      this.zoom = this.viewW / CONFIG.world.width;
+    }
+    this.camera.resize(this.viewW / this.zoom, this.viewH / this.zoom);
   }
 
   startRun() {
@@ -78,7 +82,7 @@ class Game {
     for (const w of this.weapons) w.update(dt, this);
 
     for (const b of this.bullets) {
-      if (b.update(dt)) continue;
+      if (b.update(dt, this.player)) continue;
       for (const e of this.enemies) {
         if (e.dead || b.hitSet.has(e)) continue;
         const rr = e.radius + b.radius;
@@ -135,9 +139,16 @@ class Game {
     const min = this.time / 60;
     const rate = CONFIG.spawn.baseRate + CONFIG.spawn.ratePerMin * min;
     this.spawnAcc += rate * dt;
+    let cap = CONFIG.spawn.cap;
+    if (min > CONFIG.spawn.capLateStart) {
+      cap = Math.min(
+        CONFIG.spawn.cap + (min - CONFIG.spawn.capLateStart) * CONFIG.spawn.capLateRate,
+        CONFIG.spawn.capMax
+      );
+    }
     while (this.spawnAcc >= 1) {
       this.spawnAcc -= 1;
-      if (this.enemies.length >= CONFIG.spawn.cap) break;
+      if (this.enemies.length >= cap) break;
       this.spawnEnemy(min);
     }
   }
@@ -146,8 +157,10 @@ class Game {
     const type = pickEnemyType(min);
     const pos = this.edgeSpawnPos();
     const c = CONFIG.enemies[type];
-    const hp = Math.round(c.hp * (1 + CONFIG.growth.hp * min));
-    const dmg = Math.round(c.damage * (1 + CONFIG.growth.dmg * min));
+    const g = CONFIG.growth;
+    const late = Math.max(0, min - g.lateStart);
+    const hp = Math.round(c.hp * (1 + g.hp * min + g.hpLate * late * late));
+    const dmg = Math.round(c.damage * (1 + g.dmg * min + g.dmgLate * late * late));
     const e = this.enemyPool.obtain();
     e.init(type, pos.x, pos.y, hp, dmg);
     this.enemies.push(e);
@@ -217,9 +230,9 @@ class Game {
     return best;
   }
 
-  spawnBullet(x, y, angle, kind, damage) {
+  spawnBullet(x, y, angle, params) {
     const b = this.bulletPool.obtain();
-    b.init(x, y, angle, kind, damage);
+    b.init(x, y, angle, params);
     this.bullets.push(b);
   }
 
@@ -289,8 +302,10 @@ class Game {
       tag = '武器 LV' + curLvl + ' → LV' + (curLvl + 1);
       const parts = [];
       if (a.damage !== b.damage) parts.push('伤害 ' + a.damage + '→' + b.damage);
-      if (a.count !== b.count) parts.push('数量 ' + a.count + '→' + b.count);
-      if (a.interval !== b.interval) parts.push('间隔 ' + a.interval + '→' + b.interval + 's');
+      if ((a.count || 0) !== (b.count || 0)) parts.push('数量 ' + a.count + '→' + b.count);
+      if ((a.radius || 0) !== (b.radius || 0)) parts.push('体积 ' + a.radius + '→' + b.radius);
+      if ((a.ring || 0) !== (b.ring || 0)) parts.push('环绕半径 ' + a.ring + '→' + b.ring);
+      if (!a.boomerang && b.boomerang) parts.push('解锁回旋：飞出后返回再打一轮');
       desc = parts.join(' · ') || '属性提升';
     }
     return { kind: 'weapon', id, icon: id, name: w.name, tag, desc };
@@ -331,6 +346,7 @@ class Game {
     if (this.state === 'menu') return;
 
     ctx.save();
+    ctx.scale(this.zoom, this.zoom);
     this.camera.apply(ctx);
 
     this.drawGrid(ctx);

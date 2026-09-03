@@ -3,23 +3,47 @@ class Bullet {
     this.x = 0; this.y = 0; this.vx = 0; this.vy = 0;
     this.kind = 'blade'; this.radius = 9; this.life = 1;
     this.pierce = 99; this.damage = 0; this.angle = 0;
+    this.speed = 400;
+    this.boomerang = false;
+    this.out = 0;
+    this.phase = 0;
+    this.traveled = 0;
     this.hitSet = new Set();
   }
 
-  init(x, y, angle, kind, damage) {
-    const cfg = CONFIG.bullets[kind];
+  init(x, y, angle, params) {
     this.x = x; this.y = y; this.angle = angle;
-    this.vx = Math.cos(angle) * cfg.speed;
-    this.vy = Math.sin(angle) * cfg.speed;
-    this.kind = kind;
-    this.radius = cfg.radius;
-    this.life = cfg.life;
-    this.pierce = cfg.pierce;
-    this.damage = damage;
+    this.speed = params.speed;
+    this.vx = Math.cos(angle) * this.speed;
+    this.vy = Math.sin(angle) * this.speed;
+    this.kind = params.kind;
+    this.radius = params.radius;
+    this.life = params.life;
+    this.pierce = params.pierce;
+    this.damage = params.damage;
+    this.boomerang = !!params.boomerang;
+    this.out = params.out || 0;
+    this.phase = 0;
+    this.traveled = 0;
     this.hitSet.clear();
   }
 
-  update(dt) {
+  update(dt, player) {
+    if (this.boomerang && this.phase === 0) {
+      this.traveled += this.speed * dt;
+      if (this.traveled >= this.out) {
+        this.phase = 1;
+        this.hitSet.clear();
+      }
+    }
+    if (this.phase === 1 && player) {
+      const dx = player.x - this.x, dy = player.y - this.y;
+      const d = Math.hypot(dx, dy) || 1;
+      this.angle = Math.atan2(dy, dx);
+      this.vx = dx / d * this.speed;
+      this.vy = dy / d * this.speed;
+      if (d < 26) this.life = 0;
+    }
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     this.life -= dt;
@@ -31,6 +55,8 @@ class Bullet {
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.angle);
+      const s = this.radius / 9;
+      ctx.scale(s, s);
       ctx.fillStyle = '#dff4ff';
       ctx.beginPath();
       ctx.moveTo(13, 0);

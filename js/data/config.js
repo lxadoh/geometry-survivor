@@ -4,11 +4,12 @@ const CONFIG = {
     speed: 180,
     radius: 15,
     pickupRadius: 90,
-    iframes: 0.75,
+    iframes: 0.85,
   },
+  view: { height: 800 },
   world: { width: 2800, height: 2100, grid: 120 },
-  spawn: { baseRate: 1.0, ratePerMin: 0.55, cap: 150 },
-  growth: { hp: 0.32, dmg: 0.17 },
+  spawn: { baseRate: 1.0, ratePerMin: 0.55, cap: 150, capLateStart: 3, capLateRate: 8, capMax: 240 },
+  growth: { hp: 0.32, dmg: 0.17, lateStart: 5, hpLate: 0.25, dmgLate: 0.06 },
   xp: { base: 5, perLevel: 7 },
 
   enemies: {
@@ -18,44 +19,47 @@ const CONFIG = {
   },
 
   spawnMix: [
-    { until: 1,  grunt: 1,   fast: 0,    tank: 0 },
-    { until: 2,  grunt: 0.75, fast: 0.25, tank: 0 },
-    { until: 4,  grunt: 0.62, fast: 0.26, tank: 0.12 },
-    { until: 99, grunt: 0.52, fast: 0.33, tank: 0.15 },
+    { until: 1,  grunt: 1,    fast: 0,     tank: 0 },
+    { until: 2,  grunt: 0.75, fast: 0.25,  tank: 0 },
+    { until: 4,  grunt: 0.62, fast: 0.26,  tank: 0.12 },
+    { until: 8,  grunt: 0.52, fast: 0.33,  tank: 0.15 },
+    { until: 99, grunt: 0.38, fast: 0.42,  tank: 0.2 },
   ],
 
   weapons: {
     blade: {
       name: '飞刃',
-      desc: '自动射向最近敌人的贯穿飞刀',
+      desc: '自动射向最近敌人的贯穿飞刃，3 级起可回旋往返',
+      interval: 1.1,
       levels: [
-        { count: 1, damage: 10, interval: 1.1 },
-        { count: 2, damage: 10, interval: 1.05 },
-        { count: 2, damage: 14, interval: 1.0 },
-        { count: 3, damage: 14, interval: 0.95 },
-        { count: 4, damage: 18, interval: 0.9 },
+        { count: 1, damage: 10, speed: 420, radius: 9 },
+        { count: 1, damage: 15, speed: 440, radius: 11 },
+        { count: 1, damage: 15, speed: 460, radius: 11, boomerang: true, out: 260 },
+        { count: 1, damage: 24, speed: 480, radius: 13, boomerang: true, out: 300 },
+        { count: 2, damage: 30, speed: 520, radius: 15, boomerang: true, out: 340 },
       ],
     },
     orbit: {
       name: '环绕球',
-      desc: '围绕你旋转的护体球，近身即伤',
+      desc: '围绕你旋转的护体球，升级增加球数与环绕半径',
       levels: [
-        { count: 2, damage: 10, interval: 0.35 },
-        { count: 3, damage: 10, interval: 0.32 },
-        { count: 3, damage: 15, interval: 0.28 },
-        { count: 4, damage: 15, interval: 0.25 },
-        { count: 5, damage: 20, interval: 0.22 },
+        { count: 2, damage: 10, ring: 78 },
+        { count: 3, damage: 10, ring: 78 },
+        { count: 3, damage: 15, ring: 95 },
+        { count: 4, damage: 15, ring: 95 },
+        { count: 5, damage: 22, ring: 112 },
       ],
     },
     scatter: {
       name: '散射弹',
       desc: '定时向随机方向扇形发射子弹',
+      interval: 2.2,
       levels: [
-        { count: 3, damage: 6,  interval: 2.2, spread: 0.5 },
-        { count: 3, damage: 8,  interval: 2.0, spread: 0.55 },
-        { count: 4, damage: 8,  interval: 1.9, spread: 0.6 },
-        { count: 4, damage: 10, interval: 1.8, spread: 0.65 },
-        { count: 5, damage: 12, interval: 1.7, spread: 0.7 },
+        { count: 3, damage: 6,  spread: 0.5,  radius: 6 },
+        { count: 3, damage: 9,  spread: 0.55, radius: 6 },
+        { count: 4, damage: 9,  spread: 0.6,  radius: 7 },
+        { count: 4, damage: 13, spread: 0.65, radius: 8 },
+        { count: 5, damage: 16, spread: 0.7,  radius: 9 },
       ],
     },
   },
@@ -68,9 +72,8 @@ const CONFIG = {
   },
 
   bullets: {
-    blade:   { speed: 420, radius: 9, life: 1.5, pierce: 99 },
-    scatter: { speed: 380, radius: 6, life: 1.2, pierce: 0 },
+    scatter: { speed: 380, life: 1.3 },
   },
 
-  orbit: { radius: 78, ballRadius: 12, spin: 2.6 },
+  orbit: { ballRadius: 12, spin: 2.6, hitCd: 0.4 },
 };
