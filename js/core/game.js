@@ -13,6 +13,7 @@ class Game {
     this.gems = [];
     this.lightnings = [];
     this.shocks = [];
+    this.rings = [];
     this._grid = new Map();
     this.player = new Player();
     this.weapons = [];
@@ -53,6 +54,7 @@ class Game {
     this.gems.length = 0;
     this.lightnings.length = 0;
     this.shocks.length = 0;
+    this.rings.length = 0;
     this.particles.clear();
     this.player.reset();
     this.weapons = [new WEAPON_CLASSES.blade('blade')];
@@ -114,6 +116,7 @@ class Game {
       e.update(dt, p);
       const rr = e.radius + p.radius;
       if (dist2(e.x, e.y, p.x, p.y) < rr * rr && p.takeDamage(e.damage)) {
+        AudioMan.hurt();
         HUD.damageFlash();
         this.camera.shake(7, 0.25);
         this.particles.burst(p.x, p.y, 10, '#ff6b6b', { speed: 170, life: 0.4, size: 3 });
@@ -137,6 +140,7 @@ class Game {
       const g = this.gems[i];
       if (g.update(dt, p)) {
         this.pendingLevels += p.addXp(g.value);
+        AudioMan.gem();
         this.particles.burst(p.x, p.y, 3, '#7ee787', { speed: 90, life: 0.25, size: 2 });
         this.gemPool.release(this.gems.splice(i, 1)[0]);
       }
@@ -149,7 +153,7 @@ class Game {
     if (this.pendingLevels > 0) this.openUpgrade();
   }
 
-  lightningStrike(enemy, damage) {
+  lightningStrike(enemy, damage, radius) {
     const cam = this.camera;
     const topY = cam.y - cam.vh / 2 - 80;
     const n = 6;
@@ -162,8 +166,16 @@ class Game {
       });
     }
     this.lightnings.push({ pts, life: 0.22, maxLife: 0.22 });
-    this.particles.burst(enemy.x, enemy.y, 8, '#ffe066', { speed: 200, life: 0.35, size: 2.6 });
-    this.hurtEnemy(enemy, damage, 0, 0);
+    this.rings.push({ x: enemy.x, y: enemy.y, r: 12, maxR: radius, life: 0.28, maxLife: 0.28 });
+    this.particles.burst(enemy.x, enemy.y, 10, '#ffe066', { speed: 230, life: 0.35, size: 2.6 });
+    AudioMan.zap();
+    const r2 = radius * radius;
+    for (const e of this.enemies) {
+      if (e.dead) continue;
+      if (dist2(e.x, e.y, enemy.x, enemy.y) <= r2) {
+        this.hurtEnemy(e, damage, 0, 0);
+      }
+    }
     this.camera.shake(2, 0.1);
   }
 
@@ -173,6 +185,7 @@ class Game {
       x: p.x, y: p.y, r: 18, maxR, speed: 560,
       damage, hitSet: new Set(),
     });
+    AudioMan.boom();
   }
 
   updateFX(dt) {
@@ -180,6 +193,12 @@ class Game {
       const l = this.lightnings[i];
       l.life -= dt;
       if (l.life <= 0) this.lightnings.splice(i, 1);
+    }
+    for (let i = this.rings.length - 1; i >= 0; i--) {
+      const r = this.rings[i];
+      r.life -= dt;
+      r.r = 12 + (r.maxR - 12) * (1 - r.life / r.maxLife);
+      if (r.life <= 0) this.rings.splice(i, 1);
     }
     for (let i = this.shocks.length - 1; i >= 0; i--) {
       const s = this.shocks[i];
@@ -328,6 +347,7 @@ class Game {
     this.particles.burst(e.x, e.y, 3, '#ffffff', { speed: 130, life: 0.22, size: 2.2 });
     if (e.dead) {
       this.kills++;
+      AudioMan.pop();
       this.spawnGem(e.x, e.y, e.xpValue);
       this.particles.burst(e.x, e.y, 9, e.color, { speed: 200, life: 0.45, size: 3.2 });
     }
@@ -335,8 +355,10 @@ class Game {
 
   openUpgrade() {
     this.state = 'levelup';
+    AudioMan.levelup();
     const choices = this.buildChoices();
     UpgradeUI.open(choices, c => {
+      AudioMan.click();
       this.applyChoice(c);
       UpgradeUI.close();
       this.pendingLevels--;
@@ -384,7 +406,9 @@ class Game {
       const parts = [];
       if (a.damage !== b.damage) parts.push('伤害 ' + a.damage + '→' + b.damage);
       if ((a.count || 0) !== (b.count || 0)) parts.push('数量 ' + a.count + '→' + b.count);
-      if ((a.radius || 0) !== (b.radius || 0)) parts.push('体积 ' + a.radius + '→' + b.radius);
+      if ((a.radius || 0) !== (b.radius || 0)) {
+        parts.push((id === 'lightning' ? '范围 ' : '体积 ') + a.radius + '→' + b.radius);
+      }
       if ((a.ring || 0) !== (b.ring || 0)) parts.push('环绕半径 ' + a.ring + '→' + b.ring);
       if (!a.bounces && b.bounces) parts.push('解锁弹射：命中后跳向下一个敌人');
       else if ((a.bounces || 0) < (b.bounces || 0)) parts.push('弹射 ' + a.bounces + '→' + b.bounces + ' 次');
@@ -414,6 +438,7 @@ class Game {
   gameOver() {
     this.state = 'gameover';
     HUD.hide();
+    AudioMan.over();
     const rec = { time: this.time, kills: this.kills, level: this.player.level };
     const res = SaveManager.submit(rec);
     Screens.showGameOver(rec, res.data, res.isBest);
@@ -445,6 +470,7 @@ class Game {
     this.drawShocks(ctx);
     this.particles.draw(ctx);
     this.drawLightnings(ctx);
+    this.drawRings(ctx);
 
     ctx.restore();
 
@@ -468,6 +494,17 @@ class Game {
     ctx.moveTo(pts[0].x, pts[0].y);
     for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
     ctx.stroke();
+  }
+
+  drawRings(ctx) {
+    for (const r of this.rings) {
+      const a = Math.max(0, r.life / r.maxLife);
+      ctx.strokeStyle = 'rgba(255,224,102,' + (0.55 * a).toFixed(3) + ')';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, r.r, 0, TAU);
+      ctx.stroke();
+    }
   }
 
   drawShocks(ctx) {

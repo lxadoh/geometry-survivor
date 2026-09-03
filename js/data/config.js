@@ -9,7 +9,7 @@ const CONFIG = {
   view: { height: 800 },
   world: { width: 2800, height: 2100, grid: 120 },
   spawn: { baseRate: 1.0, ratePerMin: 0.55, cap: 150, capLateStart: 3, capLateRate: 8, capMax: 240 },
-  growth: { hp: 0.32, dmg: 0.17, lateStart: 5, hpLate: 0.25, dmgLate: 0.06 },
+  growth: { hp: 0.34, dmg: 0.17, lateStart: 5, hpLate: 0.27, dmgLate: 0.06 },
   xp: { base: 5, perLevel: 7 },
 
   enemies: {
@@ -55,23 +55,23 @@ const CONFIG = {
       desc: '定时向随机方向扇形发射子弹',
       interval: 2.2,
       levels: [
-        { count: 3, damage: 6,  spread: 0.5,  radius: 6 },
-        { count: 3, damage: 9,  spread: 0.55, radius: 6 },
-        { count: 4, damage: 9,  spread: 0.6,  radius: 7 },
-        { count: 4, damage: 13, spread: 0.65, radius: 8 },
-        { count: 5, damage: 16, spread: 0.7,  radius: 9 },
+        { count: 4, damage: 6,  spread: 0.5,  radius: 6 },
+        { count: 4, damage: 9,  spread: 0.55, radius: 6 },
+        { count: 5, damage: 9,  spread: 0.6,  radius: 7 },
+        { count: 5, damage: 13, spread: 0.65, radius: 8 },
+        { count: 6, damage: 16, spread: 0.7,  radius: 9 },
       ],
     },
     lightning: {
       name: '闪电',
-      desc: '每隔数秒从天而降，劈中屏幕内随机敌人',
+      desc: '从天而降劈中屏幕内随机敌人，并波及周围的敌人',
       interval: 3.2,
       levels: [
-        { count: 1, damage: 26 },
-        { count: 1, damage: 36 },
-        { count: 2, damage: 36 },
-        { count: 2, damage: 48 },
-        { count: 3, damage: 62 },
+        { count: 1, damage: 24, radius: 95 },
+        { count: 1, damage: 32, radius: 105 },
+        { count: 2, damage: 32, radius: 115 },
+        { count: 2, damage: 42, radius: 125 },
+        { count: 3, damage: 52, radius: 140 },
       ],
     },
     shock: {

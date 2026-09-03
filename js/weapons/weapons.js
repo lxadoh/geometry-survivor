@@ -26,6 +26,7 @@ class BladeWeapon extends Weapon {
     const p = game.player;
     const target = game.nearestEnemy(p.x, p.y);
     if (!target) return false;
+    AudioMan.shoot();
     const s = this.stats;
     const base = Math.atan2(target.y - p.y, target.x - p.x);
     for (let i = 0; i < s.count; i++) {
@@ -132,7 +133,7 @@ class LightningWeapon extends Weapon {
     shuffle(cands);
     const n = Math.min(s.count, cands.length);
     for (let i = 0; i < n; i++) {
-      game.lightningStrike(cands[i], Math.round(s.damage * game.player.damageMul));
+      game.lightningStrike(cands[i], Math.round(s.damage * game.player.damageMul), s.radius);
     }
     return true;
   }

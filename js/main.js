@@ -4,8 +4,22 @@ const game = new Game(canvas);
 HUD.init();
 UpgradeUI.init();
 Screens.init({
-  start: () => game.startRun(),
-  home: () => game.toMenu(),
+  start: () => { AudioMan.click(); game.startRun(); },
+  home: () => { AudioMan.click(); game.toMenu(); },
+});
+
+const armAudio = () => { AudioMan.init(); AudioMan.resume(); };
+window.addEventListener('pointerdown', armAudio, { once: true });
+window.addEventListener('keydown', armAudio, { once: true });
+
+const muteBtn = document.getElementById('btn-mute');
+const syncMuteIcon = () => { muteBtn.textContent = AudioMan.muted ? '🔇' : '🔊'; };
+AudioMan.loadMuted();
+syncMuteIcon();
+muteBtn.addEventListener('click', () => {
+  AudioMan.setMuted(!AudioMan.muted);
+  syncMuteIcon();
+  if (!AudioMan.muted) AudioMan.click();
 });
 
 window.addEventListener('resize', () => game.resize());
