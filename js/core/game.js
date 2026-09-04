@@ -58,7 +58,7 @@ class Game {
   }
 
   startRun() {
-    for (const e of this.enemies) this.enemyPool.release(e);
+    for (const e of this.enemies) { if (!e.isBoss) this.enemyPool.release(e); }
     for (const b of this.bullets) this.bulletPool.release(b);
     for (const g of this.gems) this.gemPool.release(g);
     this.enemies.length = 0;
@@ -216,7 +216,8 @@ class Game {
     }
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       if (this.enemies[i].dead) {
-        this.enemyPool.release(this.enemies.splice(i, 1)[0]);
+        const e = this.enemies.splice(i, 1)[0];
+        if (!e.isBoss) this.enemyPool.release(e);
       }
     }
 
