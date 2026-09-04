@@ -18,6 +18,23 @@ const CONFIG = {
     tank:  { radius: 26, speed: 38,  hp: 70, damage: 16, xp: 3, color: '#d64545', knockMul: 0.25 },
   },
 
+  elite: { hpMul: 6, dmgMul: 1.3, speedMul: 0.92, radiusMul: 1.28, xpMul: 8 },
+
+  boss: {
+    warnTime: 8,
+    schedule: [3, 6, 9],
+    repeatEvery: 180,
+    hpCycleMul: 1.8,
+    bullet: { speed: 150, life: 7, radius: 7, damage: 12, max: 60 },
+    defs: {
+      square:   { name: '巨盾方阵',   radius: 46, hp: 620,  damage: 15, speed: 55, color: '#ff4d6d' },
+      triangle: { name: '三角军团之首', radius: 42, hp: 1400, damage: 17, speed: 92, color: '#ff7a3d' },
+      core:     { name: '混沌之核',   radius: 50, hp: 2600, damage: 19, speed: 40, color: '#c44dff' },
+    },
+  },
+
+  gemRain: { count: 42, value: 2 },
+
   spawnMix: [
     { until: 1,  grunt: 1,    fast: 0,     tank: 0 },
     { until: 2,  grunt: 0.75, fast: 0.25,  tank: 0 },

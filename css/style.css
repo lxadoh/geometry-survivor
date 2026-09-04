@@ -194,6 +194,67 @@ html, body {
   transition: width 0.15s ease-out;
 }
 
+/* ---------- Boss 血条 / 预警横幅 ---------- */
+#boss-bar-wrap {
+  position: absolute;
+  top: calc(56px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, 72vw);
+  text-align: center;
+  z-index: 4;
+}
+#boss-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: #ff8fa3;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  margin-bottom: 4px;
+}
+#boss-bar {
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 120, 140, 0.5);
+  overflow: hidden;
+}
+#boss-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff4d6d, #ff8fa3);
+  box-shadow: 0 0 10px rgba(255, 77, 109, 0.7);
+  transition: width 0.12s linear;
+}
+#boss-bar-wrap.hidden { display: none; }
+
+#boss-warn {
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  padding: 10px 26px;
+  border-radius: 10px;
+  font-size: clamp(16px, 3.4vw, 22px);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+  color: #ffd7dd;
+  background: rgba(120, 10, 30, 0.55);
+  border: 1.5px solid rgba(255, 90, 110, 0.8);
+  text-shadow: 0 0 12px rgba(255, 60, 90, 0.9);
+  pointer-events: none;
+}
+#boss-warn.hidden { display: none; }
+#boss-warn.on { animation: warnPulse 0.7s ease-in-out infinite; }
+@keyframes warnPulse {
+  0%, 100% { opacity: 0.55; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.04); }
+}
+
 /* ---------- 全屏界面（首页 / 三选一 / 结算） ---------- */
 .screen {
   position: fixed;
@@ -297,6 +358,18 @@ html, body {
 @keyframes cardIn {
   from { opacity: 0; transform: translateY(26px) scale(0.95); }
 }
+
+#screen-upgrade.gold .up-header { color: #ffd166; }
+#screen-upgrade.gold .card {
+  background: linear-gradient(180deg, #2a2412, #1a1a2e);
+  border-color: #ffd166;
+  box-shadow: 0 0 18px rgba(255, 209, 102, 0.25);
+}
+#screen-upgrade.gold .card:hover {
+  border-color: #ffe8a3;
+  box-shadow: 0 8px 30px rgba(255, 209, 102, 0.4);
+}
+#screen-upgrade.gold .card-icon { background: rgba(255, 209, 102, 0.1); }
 
 .card-icon {
   width: 58px;

@@ -106,6 +106,7 @@ const AudioMan = {
   zap() {
     this.noise(0.16, { freq: 2600, to: 500, q: 0.8, vol: 0.3 });
     this.tone(1500, 0.09, { type: 'sawtooth', to: 220, vol: 0.1 });
+    this.tone(60, 0.18, { type: 'sine', to: 40, vol: 0.22 });
   },
 
   boom() {
@@ -140,5 +141,57 @@ const AudioMan = {
 
   click() {
     this.tone(620, 0.04, { type: 'sine', vol: 0.1 });
+  },
+
+  bladeHit() {
+    if (!this._ok('bladeHit', 70)) return;
+    this.tone(1250, 0.045, { type: 'square', to: 480, vol: 0.035 });
+    this.tone(2400, 0.03, { type: 'sine', to: 1600, vol: 0.02 });
+  },
+
+  scatterShot() {
+    if (!this._ok('scatter', 110)) return;
+    this.noise(0.09, { freq: 1400, to: 300, q: 0.9, vol: 0.11 });
+    this.tone(300, 0.05, { type: 'triangle', to: 180, vol: 0.05 });
+  },
+
+  orbitHit() {
+    if (!this._ok('orbit', 90)) return;
+    this.tone(240, 0.09, { type: 'sine', to: 130, vol: 0.12 });
+  },
+
+  bossHit() {
+    if (!this._ok('bossHit', 130)) return;
+    this.tone(190, 0.06, { type: 'square', to: 90, vol: 0.07 });
+    this.noise(0.05, { freq: 900, to: 300, q: 1, vol: 0.06 });
+  },
+
+  alarm() {
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        this.tone(720, 0.16, { type: 'sawtooth', to: 700, vol: 0.14 });
+        this.tone(520, 0.16, { type: 'sawtooth', to: 510, vol: 0.12 });
+      }, i * 260);
+    }
+  },
+
+  bossSpawn() {
+    this.noise(0.5, { freq: 400, to: 50, q: 0.6, vol: 0.4, filter: 'lowpass' });
+    this.tone(70, 0.5, { type: 'sine', to: 30, vol: 0.4 });
+    this.tone(220, 0.35, { type: 'sawtooth', to: 55, vol: 0.18 });
+  },
+
+  bossDie() {
+    this.noise(0.8, { freq: 500, to: 60, q: 0.6, vol: 0.42, filter: 'lowpass' });
+    this.tone(60, 0.7, { type: 'sine', to: 28, vol: 0.42 });
+    [262, 330, 392, 523, 659].forEach((f, i) =>
+      setTimeout(() => this.tone(f, 0.3, { type: 'triangle', vol: 0.16 }), 250 + i * 110));
+    setTimeout(() => this.tone(1046, 0.5, { type: 'triangle', vol: 0.14 }), 900);
+  },
+
+  eliteDie() {
+    if (!this._ok('elite', 120)) return;
+    this.tone(500, 0.1, { type: 'square', to: 900, vol: 0.1 });
+    this.noise(0.18, { freq: 1800, to: 400, q: 0.8, vol: 0.16 });
   },
 };

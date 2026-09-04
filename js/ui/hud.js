@@ -12,6 +12,10 @@ const HUD = {
       xpFill: document.getElementById('xp-fill'),
       level: document.getElementById('level-badge'),
       flash: document.getElementById('damage-flash'),
+      bossWrap: document.getElementById('boss-bar-wrap'),
+      bossName: document.getElementById('boss-name'),
+      bossFill: document.getElementById('boss-fill'),
+      warn: document.getElementById('boss-warn'),
     };
     this.last = {};
   },
@@ -49,6 +53,38 @@ const HUD = {
 
     const killText = '击杀 ' + game.kills;
     if (this.set('kills', killText)) this.el.kills.textContent = killText;
+
+    if (game.activeBoss) {
+      const b = game.activeBoss;
+      const pct = clamp(b.hp / b.maxHp, 0, 1) * 100;
+      if (this.set('bossPct', Math.round(pct)) !== undefined) {
+        this.el.bossFill.style.width = pct + '%';
+      }
+    }
+  },
+
+  showBossBar(name) {
+    this.el.bossName.textContent = name;
+    this.el.bossFill.style.width = '100%';
+    this.el.bossWrap.classList.remove('hidden');
+    this.last.bossPct = 100;
+  },
+
+  hideBossBar() {
+    this.el.bossWrap.classList.add('hidden');
+  },
+
+  showWarn(name) {
+    this.el.warn.textContent = '⚠ 警告：' + name + ' 即将降临 ⚠';
+    this.el.warn.classList.remove('hidden');
+    this.el.warn.classList.remove('on');
+    void this.el.warn.offsetWidth;
+    this.el.warn.classList.add('on');
+  },
+
+  hideWarn() {
+    this.el.warn.classList.add('hidden');
+    this.el.warn.classList.remove('on');
   },
 
   damageFlash() {

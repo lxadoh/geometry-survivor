@@ -28,13 +28,23 @@ const UpgradeUI = {
     this.cardsEl = document.getElementById('cards');
   },
 
-  open(choices, onPick) {
+  open(choices, onPick, gold) {
     this.picked = false;
     this.cardsEl.innerHTML = '';
+    this.el.classList.toggle('gold', !!gold);
+    const header = this.el.querySelector('.up-header');
+    const sub = this.el.querySelector('.up-sub');
+    if (gold) {
+      if (header) header.textContent = '— BOSS 战利品 —';
+      if (sub) sub.textContent = '选择一项 · 效果翻倍';
+    } else {
+      if (header) header.textContent = '— 升级 —';
+      if (sub) sub.textContent = '选择一项强化';
+    }
     choices.forEach((c, i) => {
       const btn = document.createElement('button');
       btn.className = 'card';
-      btn.style.setProperty('--accent', this.ACCENTS[c.icon] || '#6fd3ff');
+      btn.style.setProperty('--accent', gold ? '#ffd166' : (this.ACCENTS[c.icon] || '#6fd3ff'));
       btn.style.animationDelay = (i * 0.07) + 's';
       const icon = this.ICONS[c.icon] || this.ICONS.heal;
       btn.innerHTML =
@@ -56,6 +66,7 @@ const UpgradeUI = {
 
   close() {
     this.el.classList.add('hidden');
+    this.el.classList.remove('gold');
     this.cardsEl.innerHTML = '';
   }
 };
